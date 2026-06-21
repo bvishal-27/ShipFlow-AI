@@ -1,6 +1,11 @@
 {
   "name": "@shipflow/trpc",
   "version": "0.1.0",
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "@trpc/server": "^11.18.0",
+    "zod": "^4.4.3"
+  },
   "exports": {
     ".": "./src/index.ts"
   }

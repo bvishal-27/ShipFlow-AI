@@ -1,5 +1,6 @@
 "use client"
 import { useSession } from "@/lib/auth-client"
+import { trpc } from "@/lib/trpc"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
@@ -7,19 +8,30 @@ export default function DashboardPage() {
   const { data: session, isPending } = useSession()
   const router = useRouter()
 
+  const { data: workspaces, isLoading } = trpc.workspace.getByUserId.useQuery(
+    { userId: session?.user?.id ?? "" },
+    { enabled: !!session?.user?.id }
+  )
+
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/sign-in")
     }
   }, [session, isPending, router])
 
-  if (isPending) return <p style={{ padding: 32 }}>Loading...</p>
-  if (!session) return null
+  useEffect(() => {
+    if (!isLoading && workspaces) {
+      if (workspaces.length === 0) {
+        router.push("/onboarding")
+      } else {
+        router.push(`/${workspaces[0].slug}`)
+      }
+    }
+  }, [workspaces, isLoading, router])
 
   return (
     <div style={{ padding: 32 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 600 }}>Welcome, {session.user.name} 👋</h1>
-      <p style={{ color: "#6b7280", marginTop: 8 }}>ShipFlow AI Dashboard — let's build something.</p>
+      <p style={{ color: "#6b7280" }}>Loading your workspace...</p>
     </div>
   )
 }
