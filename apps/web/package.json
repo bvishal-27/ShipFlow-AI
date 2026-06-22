@@ -8,6 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.85",
+    "@ai-sdk/google": "^3.0.83",
+    "@ai-sdk/groq": "^3.0.42",
     "@shipflow/ai": "workspace:*",
     "@shipflow/db": "workspace:*",
     "@shipflow/trpc": "workspace:*",
@@ -17,6 +20,7 @@
     "@trpc/next": "^11.18.0",
     "@trpc/react-query": "^11.18.0",
     "@trpc/server": "^11.18.0",
+    "ai": "^6.0.208",
     "autoprefixer": "^10.5.0",
     "better-auth": "^1.6.20",
     "class-variance-authority": "^0.7.1",
