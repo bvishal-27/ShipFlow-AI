@@ -129,13 +129,56 @@ export default function FeaturePage() {
       )}
 
       {feature.prd && (
-        <div style={{ marginTop: 24 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>📄 Product Requirements Document</h2>
-          <div style={{ padding: 24, border: "1px solid #e5e7eb", borderRadius: 12, whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.7 }}>
-            {feature.prd.rawContent}
-          </div>
+  <div style={{ marginTop: 24 }}>
+    <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>📄 Product Requirements Document</h2>
+    <div style={{ padding: 24, border: "1px solid #e5e7eb", borderRadius: 12, whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.7 }}>
+      {feature.prd.rawContent}
+    </div>
+
+    {feature.status === "PRD_READY" && (
+      <button
+        onClick={() => {
+          fetch("/api/ai/generate-tasks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ featureId }),
+          }).then(() => refetch())
+        }}
+        style={{ marginTop: 16, padding: "10px 20px", borderRadius: 8, background: "#7c3aed", color: "#fff", fontSize: 14, cursor: "pointer", border: "none" }}
+      >
+        ⚡ Generate Engineering Tasks
+      </button>
+    )}
+
+    {feature.tasks.length > 0 && (
+      <div style={{ marginTop: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>⚙️ Engineering Tasks</h2>
+        <div style={{ display: "flex", gap: 16 }}>
+          {["TODO", "IN_PROGRESS", "DONE"].map(status => (
+            <div key={status} style={{ flex: 1, background: "#f8fafc", borderRadius: 10, padding: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: "#475569" }}>
+                {status.replace("_", " ")} · {feature.tasks.filter(t => t.status === status).length}
+              </div>
+              {feature.tasks.filter(t => t.status === status).map(task => (
+                <div key={task.id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8, padding: 12, marginBottom: 8 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 4 }}>{task.title}</div>
+                  <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>{task.description}</div>
+                  <span style={{
+                    fontSize: 11, padding: "2px 8px", borderRadius: 99, fontWeight: 500,
+                    background: task.priority === "CRITICAL" ? "#fee2e2" : task.priority === "HIGH" ? "#fef3c7" : "#f0fdf4",
+                    color: task.priority === "CRITICAL" ? "#991b1b" : task.priority === "HIGH" ? "#92400e" : "#166534"
+                  }}>
+                    {task.priority}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
-      )}
+      </div>
+    )}
+  </div>
+)}
     </div>
   )
 }
