@@ -11,6 +11,7 @@
     "@ai-sdk/anthropic": "^3.0.85",
     "@ai-sdk/google": "^3.0.83",
     "@ai-sdk/groq": "^3.0.42",
+    "@octokit/rest": "^22.0.1",
     "@shipflow/ai": "workspace:*",
     "@shipflow/db": "workspace:*",
     "@shipflow/trpc": "workspace:*",
