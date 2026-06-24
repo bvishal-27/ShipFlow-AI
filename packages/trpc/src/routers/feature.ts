@@ -28,6 +28,10 @@ export const featureRouter = router({
           clarifications: true,
           prd: true,
           tasks: true,
+          pullRequests: {
+            include: { aiReviews: true }
+          },
+          humanApproval: true,
         }
       })
     }),
@@ -37,7 +41,15 @@ export const featureRouter = router({
     .query(async ({ ctx, input }) => {
       return ctx.db.featureRequest.findMany({
         where: { projectId: input.projectId },
-        orderBy: { createdAt: "desc" }
+        orderBy: { createdAt: "desc" },
+        include: {
+          prd: true,
+          tasks: true,
+          pullRequests: {
+            include: { aiReviews: true }
+          },
+          humanApproval: true,
+        }
       })
     }),
 
@@ -51,6 +63,40 @@ export const featureRouter = router({
       return ctx.db.clarification.update({
         where: { id: input.clarificationId },
         data: { answer: input.answer }
+      })
+    }),
+
+  approve: publicProcedure
+    .input(z.object({
+      featureId: z.string(),
+      reviewerId: z.string(),
+      decision: z.enum(["APPROVED", "REJECTED"]),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.humanApproval.create({
+        data: {
+          featureRequestId: input.featureId,
+          reviewerId: input.reviewerId,
+          decision: input.decision,
+          notes: input.notes,
+        }
+      })
+      await ctx.db.featureRequest.update({
+        where: { id: input.featureId },
+        data: {
+          status: input.decision === "APPROVED" ? "SHIPPED" : "FIX_NEEDED"
+        }
+      })
+      return { success: true }
+    }),
+
+  getApproval: publicProcedure
+    .input(z.object({ featureId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.humanApproval.findUnique({
+        where: { featureRequestId: input.featureId },
+        include: { reviewer: true }
       })
     }),
 })
