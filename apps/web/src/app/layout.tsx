@@ -1,14 +1,15 @@
-import { cn } from "@/lib/utils"
+import "./globals.css"
 import { Providers } from "@/components/providers"
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export const metadata = {
+  title: "ShipFlow AI — Feature to Production",
+  description: "AI-powered product delivery platform",
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={cn("min-h-screen bg-background font-sans antialiased")}>
+      <body>
         <Providers>
           {children}
         </Providers>
