@@ -1,13 +1,10 @@
-@import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
 :root {
   --bg-primary: #FAFAF9;
   --bg-secondary: #F5F5F4;
   --bg-card: #FFFFFF;
-  --bg-sidebar: #111111;
-  --bg-sidebar-hover: #1C1C1C;
   --border: #E7E5E4;
   --text-primary: #1C1917;
   --text-secondary: #78716C;
@@ -30,6 +27,24 @@
   --radius-xl: 16px;
 }
 
+[data-theme="dark"] {
+  --bg-primary: #0C0C0C;
+  --bg-secondary: #161616;
+  --bg-card: #1A1A1A;
+  --border: #2A2A2A;
+  --text-primary: #FAFAF9;
+  --text-secondary: #A8A29E;
+  --text-tertiary: #57534E;
+  --accent: #FF0052;
+  --accent-light: #2A0010;
+  --success-light: #052E16;
+  --error-light: #2A0000;
+  --warning-light: #1A0F00;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -2px rgba(0,0,0,0.4);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
@@ -40,6 +55,7 @@ html, body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 a { color: inherit; text-decoration: none; }
