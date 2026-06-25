@@ -45,7 +45,7 @@ export default function FeaturePage() {
     </div>
   )
 
-  const unanswered = feature.clarifications.filter((c: any) => !c.answer)
+  const unanswered = (feature.clarifications as any[]).filter((c: any) => !c.answer)
   const currentQuestion = unanswered[0]
   const allAnswered = feature.clarifications.length > 0 && unanswered.length === 0
 
@@ -60,7 +60,6 @@ export default function FeaturePage() {
       <Nav slug={slug} projectId={projectId} />
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "88px 24px 48px" }}>
 
-        {/* Header */}
         <div style={{ marginBottom: 28 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
             <h1 style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.02em" }}>{feature.title}</h1>
@@ -71,20 +70,18 @@ export default function FeaturePage() {
           <p style={{ fontSize: 14, color: "var(--text-secondary)" }}>{feature.description}</p>
         </div>
 
-        {/* AI Analyzing */}
         {clarifying && (
           <div style={{ padding: 16, background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", marginBottom: 16, display: "flex", alignItems: "center", gap: 12, boxShadow: "var(--shadow-sm)" }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FF0052", animation: "pulse 1.5s infinite" }} />
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FF0052" }} />
             <p style={{ fontSize: 14, color: "var(--text-secondary)" }}>🤖 AI is analyzing your request...</p>
           </div>
         )}
 
-        {/* Clarifications */}
         {feature.clarifications.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>💬 Clarification Questions</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {feature.clarifications.map((c: any, i: number) => (
+              {(feature.clarifications as any[]).map((c: any, i: number) => (
                 <div key={c.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 16, boxShadow: "var(--shadow-sm)" }}>
                   <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: "var(--text-primary)" }}>Q{i + 1}: {c.question}</p>
                   {c.answer ? (
@@ -114,12 +111,10 @@ export default function FeaturePage() {
           </div>
         )}
 
-        {/* Generate PRD */}
-        {allAnswered && feature.status !== "PRD_READY" && feature.status !== "PLANNING" && feature.status !== "READY_FOR_DEV" && feature.status !== "IN_DEVELOPMENT" && feature.status !== "IN_REVIEW" && feature.status !== "FIX_NEEDED" && feature.status !== "REVIEW_PASSED" && feature.status !== "SHIPPED" && (
+        {allAnswered && !["PRD_READY", "PLANNING", "READY_FOR_DEV", "IN_DEVELOPMENT", "IN_REVIEW", "FIX_NEEDED", "REVIEW_PASSED", "SHIPPED"].includes(feature.status) && (
           <div style={{ padding: 20, background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: "var(--radius-lg)", marginBottom: 24 }}>
             <p style={{ fontSize: 14, fontWeight: 600, color: "#15803D", marginBottom: 12 }}>✅ All questions answered — ready to generate PRD</p>
-            <button
-              disabled={generatingPRD}
+            <button disabled={generatingPRD}
               onClick={() => {
                 setGeneratingPRD(true)
                 fetch("/api/ai/generate-prd", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ featureId }) })
@@ -131,17 +126,14 @@ export default function FeaturePage() {
           </div>
         )}
 
-        {/* PRD */}
         {feature.prd && (
           <div style={{ marginBottom: 24 }}>
             <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>📄 Product Requirements Document</h2>
             <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 20, boxShadow: "var(--shadow-sm)", fontSize: 13, lineHeight: 1.8, color: "var(--text-primary)", whiteSpace: "pre-wrap" }}>
-              {feature.prd.rawContent}
+              {(feature.prd as any).rawContent}
             </div>
-
             {feature.status === "PRD_READY" && (
-              <button
-                disabled={generatingTasks}
+              <button disabled={generatingTasks}
                 onClick={() => {
                   setGeneratingTasks(true)
                   fetch("/api/ai/generate-tasks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ featureId }) })
@@ -154,17 +146,16 @@ export default function FeaturePage() {
           </div>
         )}
 
-        {/* Kanban */}
         {feature.tasks.length > 0 && (
           <div>
             <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>⚙️ Engineering Tasks</h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-              {["TODO", "IN_PROGRESS", "DONE"].map(status => (
+              {["TODO", "IN_PROGRESS", "DONE"].map((status: string) => (
                 <div key={status} style={{ background: "var(--bg-secondary)", borderRadius: "var(--radius-lg)", padding: 14 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    {status.replace("_", " ")} · {feature.tasks.filter(t => t.status === status).length}
+                    {status.replace("_", " ")} · {(feature.tasks as any[]).filter((t: any) => t.status === status).length}
                   </div>
-                  {feature.tasks.filter(t => t.status === status).map(task => {
+                  {(feature.tasks as any[]).filter((t: any) => t.status === status).map((task: any) => {
                     const pc = priorityColors[task.priority] || priorityColors.MEDIUM
                     return (
                       <div key={task.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", padding: 12, marginBottom: 8, boxShadow: "var(--shadow-sm)" }}>
