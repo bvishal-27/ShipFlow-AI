@@ -45,7 +45,7 @@ export default function FeaturePage() {
     </div>
   )
 
-  const unanswered = feature.clarifications.filter(c => !c.answer)
+  const unanswered = feature.clarifications.filter((c: any) => !c.answer)
   const currentQuestion = unanswered[0]
   const allAnswered = feature.clarifications.length > 0 && unanswered.length === 0
 
