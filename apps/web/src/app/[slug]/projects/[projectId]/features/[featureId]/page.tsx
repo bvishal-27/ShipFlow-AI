@@ -84,7 +84,7 @@ export default function FeaturePage() {
           <div style={{ marginBottom: 24 }}>
             <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>💬 Clarification Questions</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {feature.clarifications.map((c, i) => (
+              {feature.clarifications.map((c: any, i: number) => (
                 <div key={c.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 16, boxShadow: "var(--shadow-sm)" }}>
                   <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 10, color: "var(--text-primary)" }}>Q{i + 1}: {c.question}</p>
                   {c.answer ? (
