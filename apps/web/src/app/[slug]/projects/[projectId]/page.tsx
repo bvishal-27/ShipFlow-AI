@@ -27,10 +27,10 @@ export default function ProjectPage() {
 
   const { data: features, isLoading } = trpc.feature.list.useQuery({ projectId })
 
-  const shipped = features?.filter(f => f.status === "SHIPPED").length || 0
-  const inReview = features?.filter(f => ["IN_REVIEW", "REVIEW_PASSED"].includes(f.status)).length || 0
-  const fixNeeded = features?.filter(f => f.status === "FIX_NEEDED").length || 0
-  const inDev = features?.filter(f => ["READY_FOR_DEV", "IN_DEVELOPMENT"].includes(f.status)).length || 0
+  const shipped = features?.filter((f: any) => f.status === "SHIPPED").length || 0
+  const inReview = features?.filter((f: any) => ["IN_REVIEW", "REVIEW_PASSED"].includes(f.status)).length || 0
+  const fixNeeded = features?.filter((f: any) => f.status === "FIX_NEEDED").length || 0
+  const inDev = features?.filter((f: any) => ["READY_FOR_DEV", "IN_DEVELOPMENT"].includes(f.status)).length || 0
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
