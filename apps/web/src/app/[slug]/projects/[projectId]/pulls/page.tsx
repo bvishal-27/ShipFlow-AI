@@ -48,7 +48,7 @@ export default function PullRequestsPage() {
 
         {prs && prs.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {prs.map(pr => (
+            {(prs as any[]).map((pr: any) => (
               <div key={pr.id} onClick={() => router.push(`/${slug}/projects/${projectId}/pulls/${pr.id}`)}
                 style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "16px 20px", cursor: "pointer", boxShadow: "var(--shadow-sm)", transition: "box-shadow 0.15s" }}
                 onMouseEnter={e => e.currentTarget.style.boxShadow = "var(--shadow-md)"}

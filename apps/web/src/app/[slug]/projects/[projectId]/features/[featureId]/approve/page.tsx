@@ -106,7 +106,7 @@ export default function ApprovePage() {
             <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12 }}>
               <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>Acceptance Criteria</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {feature.prd.acceptanceCriteria.map((c, i) => (
+                {feature.prd.acceptanceCriteria.map((c: string, i: number) => (
                   <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13 }}>
                     <span style={{ color: "#FF0052", fontWeight: 600, flexShrink: 0 }}>✓</span>
                     <span style={{ color: "var(--text-primary)" }}>{c}</span>
@@ -126,8 +126,8 @@ export default function ApprovePage() {
                 {latestReview.status}
               </span>
               <span style={{ fontSize: 12, color: "var(--text-tertiary)" }}>
-                {(latestReview.blockingIssues as any[]).length} blocking · {(latestReview.nonBlockingIssues as any[]).length} non-blocking
-              </span>
+                {String(((latestReview as any).blockingIssues ?? []).length)} blocking · {String(((latestReview as any).nonBlockingIssues ?? []).length)} non-blocking
+                  </span>
             </div>
             {latestReview.summary && <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6 }}>{latestReview.summary}</p>}
           </div>

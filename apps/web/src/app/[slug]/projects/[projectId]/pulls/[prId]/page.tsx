@@ -14,7 +14,7 @@ export default function PRDetailPage() {
   const [reviewResult, setReviewResult] = useState<any>(null)
 
   const { data: prs, refetch } = trpc.github.listPRs.useQuery({ projectId })
-  const pr = prs?.find(p => p.id === prId)
+  const pr = (prs as any[])?.find((p: any) => p.id === prId)
 
   async function runReview() {
     setReviewing(true)
@@ -76,7 +76,7 @@ export default function PRDetailPage() {
         {pr.aiReviews.length > 0 && (
           <div>
             <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 14 }}>Review History</h2>
-            {pr.aiReviews.map((review) => (
+            {(pr.aiReviews as any[]).map((review: any) => (
               <div key={review.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: 20, marginBottom: 12, boxShadow: "var(--shadow-sm)" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                   <p style={{ fontSize: 14, fontWeight: 600 }}>Review #{review.reviewNumber}</p>
