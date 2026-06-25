@@ -94,7 +94,7 @@ export default function ProjectPage() {
 
         {features && features.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {features.map(feature => {
+            {features.map((feature: any) => {
               const sc = statusColors[feature.status] || statusColors.PENDING
               const latestPR = feature.pullRequests?.[0]
               const latestReview = latestPR?.aiReviews?.[latestPR.aiReviews.length - 1]
