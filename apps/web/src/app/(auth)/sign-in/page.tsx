@@ -1,7 +1,25 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
+
+function ThemeToggle() {
+  const [dark, setDark] = useState(false)
+  useEffect(() => {
+    const saved = localStorage.getItem("theme")
+    if (saved === "dark") { document.documentElement.setAttribute("data-theme", "dark"); setDark(true) }
+  }, [])
+  function toggle() {
+    const next = !dark; setDark(next)
+    document.documentElement.setAttribute("data-theme", next ? "dark" : "light")
+    localStorage.setItem("theme", next ? "dark" : "light")
+  }
+  return (
+    <button onClick={toggle} style={{ background: "none", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", padding: "6px 10px", cursor: "pointer", fontSize: 15, color: "var(--text-secondary)", lineHeight: 1 }}>
+      {dark ? "☀️" : "🌙"}
+    </button>
+  )
+}
 
 export default function SignInPage() {
   const router = useRouter()
@@ -12,8 +30,7 @@ export default function SignInPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
-    setError("")
+    setLoading(true); setError("")
     const res = await authClient.signIn.email({ email, password })
     if (res.error) setError(res.error.message || "Sign in failed")
     else router.push("/dashboard")
@@ -21,49 +38,54 @@ export default function SignInPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ width: "100%", maxWidth: 400 }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 14, background: "linear-gradient(135deg, #FF0052, #FF0052)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 20, margin: "0 auto 16px" }}>S</div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.02em" }}>Welcome back</h1>
-          <p style={{ color: "var(--text-secondary)", marginTop: 6, fontSize: 14 }}>Sign in to your ShipFlow account</p>
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", flexDirection: "column" }}>
+      <nav style={{ height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", borderBottom: "1px solid var(--border)", background: "var(--bg-card)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }} onClick={() => router.push("/")}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#FF0052", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14 }}>S</div>
+          <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)" }}>ShipFlow AI</span>
         </div>
+        <ThemeToggle />
+      </nav>
 
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", padding: 28, boxShadow: "var(--shadow-md)" }}>
-          {error && (
-            <div style={{ padding: "10px 14px", background: "var(--error-light)", border: "1px solid #FECACA", borderRadius: "var(--radius-md)", marginBottom: 16, fontSize: 13, color: "var(--error)" }}>
-              {error}
-            </div>
-          )}
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div>
-              <label style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", display: "block", marginBottom: 6 }}>Email</label>
-              <input type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} required
-                style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--bg-primary)", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
-                onFocus={e => e.target.style.borderColor = "#FF0052"}
-                onBlur={e => e.target.style.borderColor = "var(--border)"}
-              />
-            </div>
-            <div>
-              <label style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", display: "block", marginBottom: 6 }}>Password</label>
-              <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required
-                style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--bg-primary)", fontSize: 14, outline: "none", transition: "border-color 0.15s" }}
-                onFocus={e => e.target.style.borderColor = "#FF0052"}
-                onBlur={e => e.target.style.borderColor = "var(--border)"}
-              />
-            </div>
-            <button type="submit" disabled={loading}
-              style={{ marginTop: 4, padding: "11px", borderRadius: "var(--radius-md)", border: "none", background: "linear-gradient(135deg, #FF0052, #FF0052)", color: "#fff", fontSize: 14, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, transition: "opacity 0.15s" }}
-            >
-              {loading ? "Signing in..." : "Sign in →"}
-            </button>
-          </form>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ width: "100%", maxWidth: 400 }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 14, background: "#FF0052", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 20, margin: "0 auto 16px" }}>S</div>
+            <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text-primary)" }}>Welcome back</h1>
+            <p style={{ color: "var(--text-secondary)", marginTop: 6, fontSize: 14 }}>Sign in to your ShipFlow account</p>
+          </div>
+
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", padding: 28, boxShadow: "var(--shadow-md)" }}>
+            {error && <div style={{ padding: "10px 14px", background: "var(--error-light)", border: "1px solid #FECACA", borderRadius: "var(--radius-md)", marginBottom: 16, fontSize: 13, color: "var(--error)" }}>{error}</div>}
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", display: "block", marginBottom: 6 }}>Email</label>
+                <input type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} required
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--bg-primary)", fontSize: 14, outline: "none", color: "var(--text-primary)" }}
+                  onFocus={e => e.target.style.borderColor = "#FF0052"}
+                  onBlur={e => e.target.style.borderColor = "var(--border)"}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", display: "block", marginBottom: 6 }}>Password</label>
+                <input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--bg-primary)", fontSize: 14, outline: "none", color: "var(--text-primary)" }}
+                  onFocus={e => e.target.style.borderColor = "#FF0052"}
+                  onBlur={e => e.target.style.borderColor = "var(--border)"}
+                />
+              </div>
+              <button type="submit" disabled={loading}
+                style={{ marginTop: 4, padding: "11px", borderRadius: "var(--radius-md)", border: "none", background: "#FF0052", color: "#fff", fontSize: 14, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, boxShadow: "0 4px 14px rgba(255,0,82,0.35)" }}>
+                {loading ? "Signing in..." : "Sign in →"}
+              </button>
+            </form>
+          </div>
+
+          <p style={{ textAlign: "center", fontSize: 13, marginTop: 20, color: "var(--text-secondary)" }}>
+            No account?{" "}
+            <a href="/sign-up" style={{ color: "var(--accent)", fontWeight: 500 }}>Create one free</a>
+          </p>
         </div>
-
-        <p style={{ textAlign: "center", fontSize: 13, marginTop: 20, color: "var(--text-secondary)" }}>
-          No account?{" "}
-          <a href="/sign-up" style={{ color: "var(--accent)", fontWeight: 500 }}>Create one free</a>
-        </p>
       </div>
     </div>
   )
