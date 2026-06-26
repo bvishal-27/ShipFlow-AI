@@ -2,27 +2,40 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useRef } from "react"
 
-// A helper type for clean theme states
 type Theme = "dark" | "light"
 
+// Robust entry animation wrapper using clean CSS transitions triggered via IntersectionObserver
 function AnimatedSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [hasEntered, setHasEntered] = useState(false)
 
   useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
-      { threshold: 0.1 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasEntered(true)
+          observer.unobserve(el) // Stop tracking once animated in for better rendering performance
+        }
+      },
+      { 
+        threshold: 0.05,     // Triggers as soon as 5% of the element enters the screen
+        rootMargin: "0px 0px -40px 0px" // Slight offset so it springs up naturally
+      }
     )
-    if (ref.current) observer.observe(ref.current)
+    
+    observer.observe(el)
     return () => observer.disconnect()
   }, [])
 
   return (
     <div ref={ref} style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(40px)",
-      transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
+      opacity: hasEntered ? 1 : 0,
+      transform: hasEntered ? "translateY(0)" : "translateY(30px)",
+      transition: `opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`,
+      willChange: "transform, opacity"
     }}>
       {children}
     </div>
@@ -33,7 +46,6 @@ export default function Home() {
   const router = useRouter()
   const [theme, setTheme] = useState<Theme>("dark")
 
-  // Initialize theme from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem("theme") as Theme | null
     if (saved === "light") {
@@ -52,7 +64,6 @@ export default function Home() {
     localStorage.setItem("theme", nextTheme)
   }
 
-  // Define styling configurations dynamically based on active theme
   const isDark = theme === "dark"
   const colors = {
     bg: isDark ? "#09090b" : "#fafafa",
@@ -91,7 +102,7 @@ export default function Home() {
   return (
     <div style={{ minHeight: "100vh", background: colors.bg, color: colors.textPrimary, overflowX: "hidden", fontFamily: "sans-serif", transition: "background 0.3s ease, color 0.3s ease" }}>
 
-      {/* Gradient background blobs */}
+      {/* Premium Gradient mesh blobs background */}
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "-20%", left: "-10%", width: 600, height: 600, borderRadius: "50%", background: `radial-gradient(circle, rgba(255,0,82,${isDark ? "0.15" : "0.08"}) 0%, transparent 75%)`, filter: "blur(60px)" }} />
         <div style={{ position: "absolute", top: "30%", right: "-15%", width: 500, height: 500, borderRadius: "50%", background: `radial-gradient(circle, rgba(255,0,82,${isDark ? "0.1" : "0.05"}) 0%, transparent 75%)`, filter: "blur(60px)" }} />
@@ -115,7 +126,6 @@ export default function Home() {
         </div>
         <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
           
-          {/* Linked Theme Toggle Switch */}
           <button onClick={toggleTheme} style={{ background: colors.btnSecondaryBg, border: `1px solid ${colors.btnSecondaryBorder}`, backdropFilter: "blur(10px)", borderRadius: "8px", padding: "6px 10px", cursor: "pointer", fontSize: 15, color: colors.textSecondary, lineHeight: 1, transition: "all 0.15s" }}>
             {isDark ? "☀️" : "🌙"}
           </button>
@@ -179,14 +189,14 @@ export default function Home() {
         </AnimatedSection>
 
         {/* Floating stats */}
-        <AnimatedSection delay={200}>
+        <AnimatedSection delay={150}>
           <div style={{ display: "flex", gap: 24, justifyContent: "center", marginTop: 64, flexWrap: "wrap" }}>
             {[
               { value: "8", label: "Pipeline Phases", icon: "🔄" },
               { value: "AI", label: "Code Reviews", icon: "🤖" },
               { value: "100%", label: "Type Safe", icon: "⚡" },
               { value: "Live", label: "GitHub Sync", icon: "🔀" },
-            ].map(s => (
+            ].map((s, index) => (
               <div key={s.label} style={{
                 padding: "20px 24px", borderRadius: "12px",
                 background: colors.cardBg,
@@ -194,9 +204,9 @@ export default function Home() {
                 border: `1px solid ${colors.cardBorder}`,
                 boxShadow: `0 4px 24px ${colors.cardShadow}`,
                 textAlign: "center", minWidth: 120,
-                transition: "transform 0.2s, background 0.3s, border 0.3s, box-shadow 0.3s",
+                transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, border 0.3s, box-shadow 0.3s",
               }}
-                onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
+                onMouseEnter={e => e.currentTarget.style.transform = "translateY(-6px)"}
                 onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
               >
                 <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
@@ -220,7 +230,7 @@ export default function Home() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
             {steps.map((s, i) => (
-              <AnimatedSection key={s.step} delay={i * 80}>
+              <AnimatedSection key={s.step} delay={i * 60}>
                 <div style={{
                   background: i === steps.length - 1
                     ? "linear-gradient(135deg, rgba(255,0,82,0.15), rgba(255,107,157,0.05))"
@@ -229,7 +239,7 @@ export default function Home() {
                   border: i === steps.length - 1 ? "1px solid rgba(255,0,82,0.4)" : `1px solid ${colors.cardBorder}`,
                   borderRadius: "12px", padding: "24px 20px",
                   boxShadow: `0 4px 20px ${colors.cardShadow}`,
-                  transition: "transform 0.2s, background 0.3s, border 0.3s, box-shadow 0.3s",
+                  transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, border 0.3s, box-shadow 0.3s",
                   height: "100%",
                 }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${isDark ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.1)"}` }}
@@ -260,14 +270,14 @@ export default function Home() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
             {features.map((f, i) => (
-              <AnimatedSection key={f.title} delay={i * 100}>
+              <AnimatedSection key={f.title} delay={i * 80}>
                 <div style={{
                   background: colors.cardBg,
                   backdropFilter: "blur(20px)",
                   border: `1px solid ${colors.cardBorder}`,
                   borderRadius: "16px", padding: 28,
                   boxShadow: `0 4px 20px ${colors.cardShadow}`,
-                  transition: "transform 0.25s, background 0.3s, border 0.3s, box-shadow 0.3s",
+                  transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, border 0.3s, box-shadow 0.3s",
                   height: "100%",
                 }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = `0 20px 50px ${isDark ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.12)"}` }}
