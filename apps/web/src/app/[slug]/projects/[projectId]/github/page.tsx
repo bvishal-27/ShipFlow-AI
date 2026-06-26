@@ -61,7 +61,7 @@ export default function GitHubConnectPage() {
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div>
               <label style={{ fontSize: 13, fontWeight: 500, display: "block", marginBottom: 6 }}>Repository Owner</label>
-              <input type="text" placeholder="e.g. bvishal-27" value={repoOwner} onChange={e => setRepoOwner(e.target.value)} required
+              <input type="text" placeholder="e.g. github-username" value={repoOwner} onChange={e => setRepoOwner(e.target.value)} required
                 style={{ width: "100%", padding: "10px 14px", borderRadius: "var(--radius-md)", border: "1px solid var(--border)", background: "var(--bg-primary)", fontSize: 14, outline: "none" }}
                 onFocus={e => e.target.style.borderColor = "#FF0052"}
                 onBlur={e => e.target.style.borderColor = "var(--border)"}
