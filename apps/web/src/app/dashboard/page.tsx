@@ -30,8 +30,11 @@ export default function DashboardPage() {
   }, [workspaces, isLoading, router])
 
   return (
-    <div style={{ padding: 32 }}>
-      <p style={{ color: "#6b7280" }}>Loading your workspace...</p>
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ width: 44, height: 44, borderRadius: 14, background: "#FF0052", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 20, margin: "0 auto 16px" }}>S</div>
+        <p style={{ fontSize: 14, color: "var(--text-secondary)" }}>Loading your workspace...</p>
+      </div>
     </div>
   )
 }
