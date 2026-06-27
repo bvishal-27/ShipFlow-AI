@@ -104,6 +104,23 @@ export function Nav({ slug, projectId }: { slug?: string; projectId?: string }) 
             }}>
               {session.user.name?.charAt(0).toUpperCase()}
             </div>
+
+            {slug && (
+              <button
+                onClick={() => router.push(`/${slug}/billing`)}
+                style={{
+                  background: "none",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--radius-sm)",
+                  padding: "5px 12px",
+                  fontSize: 13,
+                  color: "var(--text-secondary)",
+                  cursor: "pointer"
+                }}>
+                💳 Billing
+              </button>
+            )}
+
             <button
               onClick={() => signOut().then(() => router.push("/sign-in"))}
               style={{
