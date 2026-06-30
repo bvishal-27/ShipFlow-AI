@@ -9,13 +9,7 @@
 
 ## Project Overview
 
-ShipFlow AI helps software teams move features from idea to production through a structured, AI-assisted workflow.
-
-```
-Feature Request → AI Clarifies → PRD Generated → Tasks Created → PR Tracked → AI Reviews → Human Approves → Shipped
-```
-
----
+ShipFlow AI helps software teams move features from idea to production through a structured, AI-assisted workflow.       Feature Request → AI Clarifies → PRD Generated → Tasks Created → PR Tracked → AI Reviews → Human Approves → Shipped     ---
 
 ## Tech Stack
 
@@ -36,19 +30,14 @@ Feature Request → AI Clarifies → PRD Generated → Tasks Created → PR Trac
 
 ---
 
-## Architecture
-
-```
-shipflow-ai/
+## Architecture    shipflow-ai/
 ├── apps/
 │   └── web/          # Next.js app + API routes
+│       └── src/inngest/   # Inngest client + functions
 ├── packages/
 │   ├── db/           # Prisma schema + client
 │   ├── trpc/         # tRPC routers
-│   └── ai/           # AI utilities
-```
-
----
+│   └── ai/           # AI utilities    ---
 
 ## Setup Instructions
 
@@ -72,6 +61,8 @@ GITHUB_CLIENT_ID=your-github-client-id
 GITHUB_CLIENT_SECRET=your-github-client-secret
 GITHUB_WEBHOOK_SECRET=your-webhook-secret
 GROQ_API_KEY=your-groq-key
+INNGEST_EVENT_KEY=your-inngest-event-key
+INNGEST_SIGNING_KEY=your-inngest-signing-key
 ```
 
 Create `packages/db/.env`:
@@ -105,22 +96,18 @@ pnpm --filter web dev
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth App client secret |
 | `GITHUB_WEBHOOK_SECRET` | Webhook signature secret |
 | `GROQ_API_KEY` | Groq API key for AI features |
+| `INNGEST_EVENT_KEY` | Inngest event key for async workflows |
+| `INNGEST_SIGNING_KEY` | Inngest signing key for request verification |
 
 ---
 
-## Database Schema
-
-```
-Workspace → Project → FeatureRequest
-                          ├── Clarification
-                          ├── PRD
-                          ├── Task
-                          └── PullRequest
-                                ├── AIReview
-                                └── HumanApproval
-```
-
-Full schema: `packages/db/prisma/schema.prisma`
+## Database Schema   Workspace → Project → FeatureRequest
+├── Clarification
+├── PRD
+├── Task
+└── PullRequest
+├── AIReview
+└── HumanApproval   Full schema: `packages/db/prisma/schema.prisma`
 
 ---
 
@@ -139,12 +126,15 @@ Full schema: `packages/db/prisma/schema.prisma`
 
 ## Inngest Workflow Explanation
 
-| Workflow | Trigger | Description |
+Long-running AI operations run as durable, step-based Inngest functions (`apps/web/src/inngest/functions.ts`), registered at `apps/web/src/app/api/inngest/route.ts`:
+
+| Function | Event Trigger | Description |
 |---|---|---|
-| Clarification | Feature submitted | AI generates clarifying questions |
-| PRD Generation | All questions answered | AI writes full structured PRD |
-| Task Generation | PRD ready | AI breaks PRD into engineering tasks |
-| AI Review | PR opened via webhook | AI reads diff, checks PRD criteria, posts GitHub comment |
+| `generatePRD` | `shipflow/prd.generate` | Fetches feature + clarifications, calls Groq to produce a structured 7-section PRD, persists it, updates feature status to `PRD_READY` |
+| `generateTasks` | `shipflow/tasks.generate` | Reads the PRD, generates 5-8 prioritized engineering tasks via Groq, saves them to the Kanban board, updates status to `READY_FOR_DEV` |
+| `runAIReview` | `shipflow/review.run` | Fetches the PR diff via Octokit, checks it against PRD acceptance criteria using Groq, saves blocking/non-blocking issues, posts a review comment on GitHub, updates feature status to `REVIEW_PASSED` or `FIX_NEEDED` |
+
+Each function is broken into discrete `step.run()` calls, so Inngest automatically retries failed steps without re-running the whole workflow, and the entire execution history is visible in the Inngest dashboard.
 
 ---
 
@@ -155,9 +145,9 @@ All AI powered by **Groq Llama 4 Scout** via AI SDK with structured outputs:
 | Feature | Description |
 |---|---|
 | Clarification Agent | Asks 2-3 targeted questions before writing PRD |
-| PRD Generator | Creates 7-section PRD (problem, goals, stories, criteria, edge cases, metrics) |
-| Task Generator | Breaks PRD into 5-8 prioritized engineering tasks |
-| Code Review Agent | Reads real PR diff, checks acceptance criteria, posts blocking/non-blocking issues to GitHub |
+| PRD Generator | Creates 7-section PRD (problem, goals, stories, criteria, edge cases, metrics) — runs via Inngest |
+| Task Generator | Breaks PRD into 5-8 prioritized engineering tasks — runs via Inngest |
+| Code Review Agent | Reads real PR diff, checks acceptance criteria, posts blocking/non-blocking issues to GitHub — runs via Inngest |
 
 ---
 
